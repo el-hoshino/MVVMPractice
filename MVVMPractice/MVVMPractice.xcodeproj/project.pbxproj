@@ -135,6 +135,7 @@
 				BFBC89021F98AEDC00FFD3BF /* Sources */,
 				BFBC89031F98AEDC00FFD3BF /* Frameworks */,
 				BFBC89041F98AEDC00FFD3BF /* Resources */,
+				BFBC89371F98AF3C00FFD3BF /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -193,6 +194,7 @@
 				TargetAttributes = {
 					BFBC89051F98AEDC00FFD3BF = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = KC8N9BMQJY;
 						ProvisioningStyle = Automatic;
 					};
 					BFBC89191F98AEDD00FFD3BF = {
@@ -253,6 +255,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BFBC89371F98AF3C00FFD3BF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(PROJECT_DIR)/../Carthage/Build/iOS/RxSwift.framework",
+				"$(PROJECT_DIR)/../Carthage/Build/iOS/RxCocoa.framework",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "carthage copy-frameworks";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BFBC89021F98AEDC00FFD3BF /* Sources */ = {
@@ -341,6 +361,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../Carthage/Build/iOS";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -391,6 +412,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../Carthage/Build/iOS";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -412,6 +434,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = KC8N9BMQJY;
 				INFOPLIST_FILE = MVVMPractice/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.crazism.MVVMPractice;
@@ -424,6 +447,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = KC8N9BMQJY;
 				INFOPLIST_FILE = MVVMPractice/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.crazism.MVVMPractice;
