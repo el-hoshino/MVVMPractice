@@ -17,18 +17,18 @@ class ViewController: UIViewController {
     @IBOutlet weak var labelA: UILabel!
     @IBOutlet weak var labelB: UILabel!
     
-    let viewModel = ViewModel()
+    private(set) lazy var viewModel: ViewModel = {
+        let input = self.input.rx.text.orEmpty.asDriver(onErrorDriveWith: .empty())
+        return ViewModel(input: input)
+    }()
     
-    let bag = DisposeBag()
+    private let bag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        let text = input.rx.text.shareReplay(1)
-        text.bind(to: viewModel.rx.text).disposed(by: bag)
-        
-        let display = viewModel.rx.display.shareReplay(1).subscribeOn(MainScheduler.instance)
+        let display = viewModel.output.shareReplay(1).subscribeOn(MainScheduler.instance)
         display.bind(to: labelA.rx.text).disposed(by: bag)
         display.bind(to: labelB.rx.text).disposed(by: bag)
         
@@ -47,30 +47,29 @@ class ViewModel {
     
     let model = Model()
     
-    let bag: DisposeBag = .init()
+    private let result: Variable<String> = .init("")
     
-}
-
-extension ViewModel: ReactiveCompatible {
+    private let disposeBag = DisposeBag()
     
-}
-
-extension Reactive where Base: ViewModel {
+    let output: Observable<String>
     
-    var text: UIBindingObserver<Base, String?> {
-        return UIBindingObserver(UIElement: self.base, binding: { (base, text) in
-            base.model.updateText(text)
-        })
-    }
-    
-    var display: Observable<String> {
-        return base.model.int.asObservable().map {
-            if let result = $0 {
-                return "\(result)"
-            } else {
-                return "Invalid"
-            }
+    init(input: Driver<String>) {
+        
+        self.output = self.result.asObservable()
+        
+        self.model.setOnResultChangedAction { (newValue) in
+            self.result.value = newValue.map({ "\($0)" }) ?? ""
         }
+        
+        input.drive(onNext: { (string) in
+            let components = string.components(separatedBy: "+").map({ $0.trimmingCharacters(in: .whitespaces) })
+            if components.count >= 2, let a = Int(components[0]), let b = Int(components[1]) {
+                self.model.add(a, with: b)
+            } else {
+                self.model.reset()
+            }
+        }, onCompleted: nil, onDisposed: nil).disposed(by: self.disposeBag)
+        
     }
     
 }
@@ -78,16 +77,32 @@ extension Reactive where Base: ViewModel {
 // MARK: - Model
 class Model {
     
-    let int: Variable<Int?> = .init(nil)
+    private var onResultChanged: ((_ newResult: Int?) -> Void)?
     
-    func updateText(_ text: String?) {
-        
-        guard let components = text?.components(separatedBy: "+") else { int.value = nil; return }
-        guard let a = components.first, let b = components.dropFirst().first else { int.value = nil; return }
-        guard let intA = Int(a), let intB = Int(b) else { int.value = nil; return }
-        
-        int.value = intA + intB
-        
+    private(set) var result: Int? = nil {
+        willSet {
+            self.onResultChanged?(newValue)
+        }
+    }
+    
+    init(onResultChanged: ((_ newResult: Int?) -> Void)? = nil) {
+        self.onResultChanged = onResultChanged
+    }
+    
+    func setOnResultChangedAction(_ action: @escaping (_ newResult: Int?) -> Void) {
+        self.onResultChanged = action
+    }
+    
+    func reset() {
+        DispatchQueue.global().async {
+            self.result = nil
+        }
+    }
+    
+    func add(_ a: Int, with b: Int) {
+        DispatchQueue.global().async {
+            self.result = a + b
+        }
     }
     
 }
